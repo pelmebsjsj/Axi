@@ -4,15 +4,16 @@ from PIL import Image, ImageDraw, ImageFont
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes
 
-AXI_FONT_PATH = "AxiFont.ttf"    # Путь к вашему кастомному шрифту AXI
-CAPTION_FONT_SIZE = 42           # Размер шрифта для подписи
-CAPTION_MARGIN = 40              # Отступ сверху для подписи
+AXI_FONT_PATH = "AxiFont.ttf"
+CAPTION_FONT_SIZE = 42
+CAPTION_MARGIN = 40
 
 def get_token():
     token = os.environ.get("BOT_TOKEN")
     if not token:
         print("ОШИБКА: Переменная окружения BOT_TOKEN не установлена!")
-        exit(1)
+        # Можно раскомментировать строку ниже и вписать свой токен для локального теста
+        # token = "ВАШ_ТОКЕН_ЗДЕСЬ"
     return token
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -80,8 +81,12 @@ async def add_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
     TOKEN = get_token()
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.PHOTO, add_caption))
-    print("Бот запущен.")
-    app.run_polling()
+    if not TOKEN:
+        print("Не задан токен бота! Проверьте переменную окружения BOT_TOKEN.")
+        print("Для теста можно прописать токен прямо в коде (но не для боевого запуска!)")
+    else:
+        app = ApplicationBuilder().token(TOKEN).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(MessageHandler(filters.PHOTO, add_caption))
+        print("Бот запущен.")
+        app.run_polling()
